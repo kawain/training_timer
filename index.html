@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイマー</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .timer {
+            font-size: 2rem;
+        }
+
+        button {
+            font-size: 1rem;
+            margin: 10px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="timer">
+        <span id="minutes">0</span>:<span id="seconds">00</span>
+    </div>
+    <button id="startButton">スタート</button>
+    <button id="stopButton">停止</button>
+    <button id="resetButton">リセット</button>
+
+    <script>
+        const minutesDisplay = document.getElementById('minutes');
+        const secondsDisplay = document.getElementById('seconds');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const resetButton = document.getElementById('resetButton');
+        let beepSound = new Audio('./Hi-Hat-Closed-Hit.mp3');
+
+        let minutes = 0;
+        let seconds = 0;
+        let timerInterval;
+        let running = false;
+
+        function updateTimer() {
+            seconds++;
+            if (seconds >= 60) {
+                minutes++;
+                seconds = 0;
+            }
+
+            minutesDisplay.textContent = minutes;
+            secondsDisplay.textContent = seconds < 10 ? `0${seconds}` : seconds;
+
+            beepSound.pause();
+            beepSound.currentTime = 0;
+            beepSound.play();
+
+        }
+
+        function startTimer() {
+            if (!running) {
+                running = true;
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+        }
+
+        function stopTimer() {
+            running = false;
+            clearInterval(timerInterval);
+            beepSound.pause();
+            beepSound.currentTime = 0;
+        }
+
+        function resetTimer() {
+            running = false;
+            clearInterval(timerInterval);
+            minutes = 0;
+            seconds = 0;
+            minutesDisplay.textContent = '0';
+            secondsDisplay.textContent = '00';
+            beepSound.pause();
+            beepSound.currentTime = 0;
+        }
+
+        startButton.addEventListener('click', startTimer);
+        stopButton.addEventListener('click', stopTimer);
+        resetButton.addEventListener('click', resetTimer);
+
+    </script>
+</body>
+
+</html>
