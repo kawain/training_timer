@@ -4,15 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>タイマー</title>
+    <title>筋トレ・タイマー</title>
     <style>
-        body {
+        .itemBox {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .timeBox {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
         }
 
         .timer {
@@ -29,70 +31,129 @@
 
 <body>
 
-    <div class="timer">
-        <span id="minutes">0</span>:<span id="seconds">00</span>
+    <div class="itemBox">
+        <h1>種目</h1>
+        <button>種目変更</button>
     </div>
-    <button id="startButton">スタート</button>
-    <button id="stopButton">停止</button>
-    <button id="resetButton">リセット</button>
+
+    <div class="timeBox">
+        <div class="timer">
+            <span id="minutes">0</span>:<span id="seconds">00</span>
+        </div>
+        <button id="startButton">スタート</button>
+        <button id="stopButton">停止</button>
+        <button id="resetButton">リセット</button>
+    </div>
 
     <script>
-        const minutesDisplay = document.getElementById('minutes');
-        const secondsDisplay = document.getElementById('seconds');
-        const startButton = document.getElementById('startButton');
-        const stopButton = document.getElementById('stopButton');
-        const resetButton = document.getElementById('resetButton');
-        let beepSound = new Audio('./Hi-Hat-Closed-Hit.mp3');
+        const items = [
+            "バックランジ",
+            "スクワット",
+            "シングルレッグカーフレイズ",
+            "ヒップリフト",
+            "ロシアンツイスト",
+            "バイシクルクランチ",
+            "ホローホールド",
+            "レッグレイズ",
+            "プランク",
+            "プランクレッグレイズ",
+            "サイドプランク",
+            "リバースプランク",
+            "ノーマルプッシュアップ",
+            "ナロープッシュアップ",
+            "ワイドプッシュアップ",
+            "シングルレッグプッシュアップ",
+            "パイクプッシュアップ",
+            "プランクアップダウン",
+            "サイドプッシュアップ",
+            "ヒンズープッシュアップ",
+            "プッシュアップショルダータッチ",
+            "リバースプッシュアップ",
+            "マウンテンクライマー",
+        ]
 
-        let minutes = 0;
-        let seconds = 0;
-        let timerInterval;
-        let running = false;
+        const itemName = document.querySelector('.itemBox h1')
+        const itemButton = document.querySelector('.itemBox button')
+        const minutesDisplay = document.getElementById('minutes')
+        const secondsDisplay = document.getElementById('seconds')
+        const startButton = document.getElementById('startButton')
+        const stopButton = document.getElementById('stopButton')
+        const resetButton = document.getElementById('resetButton')
+        let beepSound = new Audio('./Hi-Hat-Closed-Hit.mp3')
+        let newArray
+        let arrayIndex = 0
+        let minutes = 0
+        let seconds = 0
+        let timerInterval
+        let running = false
+
+        function shuffleArray(array) {
+            const cloneArray = [...array]
+            for (let i = cloneArray.length - 1; i >= 0; i--) {
+                let rand = Math.floor(Math.random() * (i + 1))
+                // 配列の要素の順番を入れ替える
+                let tmpStorage = cloneArray[i]
+                cloneArray[i] = cloneArray[rand]
+                cloneArray[rand] = tmpStorage
+            }
+            return cloneArray
+        }
+
+        function updateItem() {
+            itemName.innerHTML = `${arrayIndex + 1}. ${newArray[arrayIndex]}`
+            arrayIndex++
+            if (newArray.length <= arrayIndex) {
+                arrayIndex = 0
+            }
+        }
 
         function updateTimer() {
-            seconds++;
+            seconds++
             if (seconds >= 60) {
-                minutes++;
-                seconds = 0;
+                minutes++
+                seconds = 0
             }
 
-            minutesDisplay.textContent = minutes;
-            secondsDisplay.textContent = seconds < 10 ? `0${seconds}` : seconds;
+            minutesDisplay.textContent = minutes
+            secondsDisplay.textContent = seconds < 10 ? `0${seconds}` : seconds
 
-            beepSound.pause();
-            beepSound.currentTime = 0;
-            beepSound.play();
-
+            beepSound.pause()
+            beepSound.currentTime = 0
+            beepSound.play()
         }
 
         function startTimer() {
             if (!running) {
-                running = true;
-                timerInterval = setInterval(updateTimer, 1000);
+                running = true
+                timerInterval = setInterval(updateTimer, 1000)
             }
         }
 
         function stopTimer() {
-            running = false;
-            clearInterval(timerInterval);
-            beepSound.pause();
-            beepSound.currentTime = 0;
+            running = false
+            clearInterval(timerInterval)
+            beepSound.pause()
+            beepSound.currentTime = 0
         }
 
         function resetTimer() {
-            running = false;
-            clearInterval(timerInterval);
-            minutes = 0;
-            seconds = 0;
-            minutesDisplay.textContent = '0';
-            secondsDisplay.textContent = '00';
-            beepSound.pause();
-            beepSound.currentTime = 0;
+            running = false
+            clearInterval(timerInterval)
+            minutes = 0
+            seconds = 0
+            minutesDisplay.textContent = '0'
+            secondsDisplay.textContent = '00'
+            beepSound.pause()
+            beepSound.currentTime = 0
         }
 
-        startButton.addEventListener('click', startTimer);
-        stopButton.addEventListener('click', stopTimer);
-        resetButton.addEventListener('click', resetTimer);
+        itemButton.addEventListener('click', updateItem)
+        startButton.addEventListener('click', startTimer)
+        stopButton.addEventListener('click', stopTimer)
+        resetButton.addEventListener('click', resetTimer)
+
+        // 初回実行
+        newArray = shuffleArray(items)
 
     </script>
 </body>
