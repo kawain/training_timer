@@ -6,9 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>筋トレ・タイマー</title>
     <style>
-        .itemBox {
+        body {
+            background-color: black;
+            color: aliceblue;
+        }
+
+        h1,
+        p {
             text-align: center;
-            margin-bottom: 50px;
+        }
+
+        .itemBox {
+            width: 300px;
+            margin: 10px auto;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
         }
 
         .timeBox {
@@ -31,9 +46,13 @@
 
 <body>
 
+    <h1>種目</h1>
+
+    <p>
+        ※ checkしたものはlocalStorageに保存。48時間表示しない。
+    </p>
+
     <div class="itemBox">
-        <h1>種目</h1>
-        <button>種目変更</button>
     </div>
 
     <div class="timeBox">
@@ -69,19 +88,17 @@
             "ヒンズープッシュアップ",
             "プッシュアップショルダータッチ",
             "リバースプッシュアップ",
-            "マウンテンクライマー",
+            "マウンテンクライマー"
         ]
 
-        const itemName = document.querySelector('.itemBox h1')
-        const itemButton = document.querySelector('.itemBox button')
+        const localStorageKeyName = "myData"
+        const itemBox = document.querySelector('.itemBox')
         const minutesDisplay = document.getElementById('minutes')
         const secondsDisplay = document.getElementById('seconds')
         const startButton = document.getElementById('startButton')
         const stopButton = document.getElementById('stopButton')
         const resetButton = document.getElementById('resetButton')
         let beepSound = new Audio('./Hi-Hat-Closed-Hit.mp3')
-        let newArray
-        let arrayIndex = 0
         let minutes = 0
         let seconds = 0
         let timerInterval
@@ -100,11 +117,33 @@
         }
 
         function updateItem() {
-            itemName.innerHTML = `${arrayIndex + 1}. ${newArray[arrayIndex]}`
-            arrayIndex++
-            if (newArray.length <= arrayIndex) {
-                arrayIndex = 0
+            let newArray = shuffleArray(items)
+            let html = ""
+            // ローカルストレージを読み込む
+            const data = localStorage.getItem(localStorageKeyName)
+            if (data) {
+                const date = new Date()
+                // ミリ秒
+                const time = date.getTime()
+                // オブジェクトに戻す
+                const obj = JSON.parse(data)
+                for (const v of newArray) {
+                    if (obj[v]) {
+                        const diff = time - obj[v]
+                        const result = Math.floor(diff / (1000 * 60 * 60))
+                        if (result >= 48) {
+                            html += `<label><input type="checkbox"> ${v}</label>`
+                        }
+                    } else {
+                        html += `<label><input type="checkbox"> ${v}</label>`
+                    }
+                }
+            } else {
+                for (const v of newArray) {
+                    html += `<label><input type="checkbox"> ${v}</label>`
+                }
             }
+            itemBox.innerHTML = html
         }
 
         function updateTimer() {
@@ -147,13 +186,43 @@
             beepSound.currentTime = 0
         }
 
-        itemButton.addEventListener('click', updateItem)
+        function setLocalStorage(e) {
+            let elm = e.target
+            if (elm.tagName === "INPUT" && elm.getAttribute("type") === "checkbox") {
+                const date = new Date()
+                // ミリ秒
+                const time = date.getTime()
+                // チェックできなくする
+                elm.disabled = true
+                const keyText = elm.parentNode.textContent.trim()
+                // ローカルストレージを読み込む
+                const data = localStorage.getItem(localStorageKeyName)
+                if (data) {
+                    // オブジェクトに戻す
+                    const obj = JSON.parse(data)
+                    // 追加
+                    obj[keyText] = time
+                    // 文字列にする
+                    const json = JSON.stringify(obj)
+                    // ローカルストレージに書き込む
+                    localStorage.setItem(localStorageKeyName, json)
+                } else {
+                    // keyに変数展開したいときは[]で変数名を囲う
+                    // 文字列にする
+                    const json = JSON.stringify({ [keyText]: time })
+                    // ローカルストレージに書き込む
+                    localStorage.setItem(localStorageKeyName, json)
+                }
+            }
+        }
+
         startButton.addEventListener('click', startTimer)
         stopButton.addEventListener('click', stopTimer)
         resetButton.addEventListener('click', resetTimer)
+        itemBox.addEventListener('click', setLocalStorage)
 
         // 初回実行
-        newArray = shuffleArray(items)
+        updateItem()
 
     </script>
 </body>
