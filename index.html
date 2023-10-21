@@ -7,8 +7,8 @@
     <title>筋トレ・タイマー</title>
     <style>
         body {
-            background-color: black;
-            color: aliceblue;
+            background-color: white;
+            color: black;
         }
 
         h1,
@@ -17,13 +17,14 @@
         }
 
         .itemBox {
-            width: 300px;
+            width: 500px;
             margin: 10px auto;
             margin-bottom: 30px;
         }
 
         label {
             display: block;
+            margin-top: 10px;
         }
 
         .timeBox {
@@ -41,19 +42,16 @@
             margin: 10px;
         }
 
+        label {
+            font-size: 1.2rem;
+        }
+
     </style>
 </head>
 
 <body>
 
     <h1>種目</h1>
-
-    <p>
-        ※ checkしたものはlocalStorageに保存。48時間表示しない。
-    </p>
-
-    <div class="itemBox">
-    </div>
 
     <div class="timeBox">
         <div class="timer">
@@ -64,39 +62,49 @@
         <button id="resetButton">リセット</button>
     </div>
 
+    <p>
+        ※ checkしたものはlocalStorageに保存。<span id="period">36</span>時間表示しない。
+    </p>
+
+    <div class="itemBox">
+    </div>
+
     <script>
         const items = [
-            "バックランジ",
-            "スクワット",
-            "シングルレッグカーフレイズ",
-            "ヒップリフト",
-            "ロシアンツイスト",
-            "バイシクルクランチ",
-            "ホローホールド",
-            "レッグレイズ",
-            "プランク",
-            "プランクレッグレイズ",
-            "サイドプランク",
-            "リバースプランク",
-            "ノーマルプッシュアップ",
-            "ナロープッシュアップ",
-            "ワイドプッシュアップ",
-            "シングルレッグプッシュアップ",
-            "パイクプッシュアップ",
-            "プランクアップダウン",
-            "サイドプッシュアップ",
-            "ヒンズープッシュアップ",
-            "プッシュアップショルダータッチ",
-            "リバースプッシュアップ",
-            "マウンテンクライマー",
-            "ショルダープレス（チューブ）",
-            "ダブルクランチ",
-            "デッドリフト（チューブ）",
-            "ブルガリアンスクワット",
-            "スーパーマン",
+            ["スクワット", "膝を直角以上に曲げない。膝がつま先より前に出ないようにお尻を突き出す。膝はつま先と同じ方向に曲げる。"],
+            ["バックランジ", "重心は前。姿勢は真っ直ぐ。前膝はつま先より前に出ない。後ろ膝は軽く床につけて一瞬止まる感じ。"],
+            ["ブルガリアンスクワット", "片足でスクワット"],
+            ["シングルレッグカーフレイズ", "壁に手を付き、片足をもう片方の足に掛けた姿勢から爪先立ちになり、かかとを上下させる。ふくらはぎの筋トレ。"],
+            ["マウンテンクライマー", "腕立て伏せの姿勢で片膝を交互に胸に引きつけて戻す動作。リズムよく。"],
+            ["ヒップリフト", "仰向けに寝て、足を腰幅に広げて膝を曲げ、膝から肩までが一直線になるまで腰を上げる。下げたときはお尻が地面すれすれになるように。"],
+
+            ["クランチ", "仰向けで寝て、太ももが床から直角になる位置に上げ、足先は膝よりやや上で、両足は揃える。頭の後ろで手を組み上半身を丸めて起こす感じ。肩甲骨が床から離れるまで起こす。"],
+            ["レッグレイズ", "仰向けに寝て、両脚は揃えて上下に動かす。床に足はつけない。"],
+            ["プランク", "両肘をついて腕立て伏せのような真っ直ぐな姿勢をキープ。"],
+            ["パイクプランク", "プランク状態でお尻を上げ体をくの字の曲げた状態にして元に戻す。"],
+            ["プランクレッグレイズ", "プランク状態で後ろ足を交互に上げる。"],
+            ["リバースプランク", "腕立て伏せの逆向き姿勢でキープ。"],
+            ["サイドプランク", "片肘をついて横向きになる体勢をキープ。"],
+            ["ホローホールド", "仰向けに寝たら、両手を万歳、両足を床から上げた状態を維持する。"],
+            ["ロシアンツイスト", "両足を上げ、リズムよく体をねじり、交互に両手指先を左右の床につける。"],
+            ["バイシクルクランチ", "仰向けに寝て腕は頭の後ろで組む。肘と膝をクロスしてタッチ。"],
+            ["バックエクステンション", "うつ伏せの状態になり、両手を頭の後ろで組み、息を吐きながら、無理なく上がる高さまで上体を上げ下げする。"],
+            ["スーパーマン", "ホローホールドの逆。"],
+            ["デッドリフト（チューブ）", "下からチューブを引っ張る。"],
+
+            ["プッシュアップ", "腕立て伏せ"],
+            ["ナロープッシュアップ", "手の幅を狭くした腕立て伏せ"],
+            ["ワイドプッシュアップ", "手の幅を広くした腕立て伏せ"],
+            ["パイクプッシュアップ", "お尻を高く上げて、体をくの字の曲げた状態で、頭を床につけるようにする腕立て伏せ。肩に効く。"],
+            ["プランクアップダウン", "腕立て伏せの状態で、肩から足までがまっすぐになるように保ちます。右腕を曲げて肘をつき、次に左腕を曲げて肘をつきます。今度は右の肘を上げて手で立ち、左のひじも持ち上げ元の位置に戻ります。"],
+            ["サイドプッシュアップ", "横向きになった姿勢で片腕で体を持ち上げる。"],
+            ["ヒンズープッシュアップ", "お尻を高く上げて、体をくの字の曲げた状態で、全身で大きな円を描くような腕立て伏せ。"],
+            ["リバースプッシュアップ", "後ろ向きの腕立て。"],
+            ["ショルダープレス（チューブ）", "座ってダンベルを上下するように肩を鍛える。"],
         ]
 
         const localStorageKeyName = "myData"
+        const period = Number(document.getElementById('period').textContent)
         const itemBox = document.querySelector('.itemBox')
         const minutesDisplay = document.getElementById('minutes')
         const secondsDisplay = document.getElementById('seconds')
@@ -109,21 +117,55 @@
         let timerInterval
         let running = false
 
-        function shuffleArray(array) {
-            const cloneArray = [...array]
-            for (let i = cloneArray.length - 1; i >= 0; i--) {
-                let rand = Math.floor(Math.random() * (i + 1))
-                // 配列の要素の順番を入れ替える
-                let tmpStorage = cloneArray[i]
-                cloneArray[i] = cloneArray[rand]
-                cloneArray[rand] = tmpStorage
+
+        function addLocalStorage(keyText) {
+            const date = new Date()
+            // ミリ秒
+            const time = date.getTime()
+            // ローカルストレージを読み込む
+            const data = localStorage.getItem(localStorageKeyName)
+            if (data) {
+                // オブジェクトに戻す
+                const obj = JSON.parse(data)
+                // 追加
+                obj[keyText] = time
+                // 文字列にする
+                const json = JSON.stringify(obj)
+                // ローカルストレージに書き込む
+                localStorage.setItem(localStorageKeyName, json)
+            } else {
+                // keyに変数展開したいときは[]で変数名を囲う
+                // 文字列にする
+                const json = JSON.stringify({ [keyText]: time })
+                // ローカルストレージに書き込む
+                localStorage.setItem(localStorageKeyName, json)
             }
-            return cloneArray
         }
 
-        function updateItem() {
-            let newArray = shuffleArray(items)
-            let html = ""
+        function delLocalStorage(keyText) {
+            // ローカルストレージを読み込む
+            const data = localStorage.getItem(localStorageKeyName)
+            if (data) {
+                // オブジェクトに戻す
+                const obj = JSON.parse(data)
+                // 新しいオブジェクト
+                const newObj = {}
+                // キーを反復
+                for (const k in obj) {
+                    if (k === keyText) {
+                        continue
+                    } else {
+                        newObj[k] = obj[k]
+                    }
+                }
+                // 文字列にする
+                const json = JSON.stringify(newObj)
+                // ローカルストレージに書き込む
+                localStorage.setItem(localStorageKeyName, json)
+            }
+        }
+
+        function updateLocalStorage() {
             // ローカルストレージを読み込む
             const data = localStorage.getItem(localStorageKeyName)
             if (data) {
@@ -132,20 +174,43 @@
                 const time = date.getTime()
                 // オブジェクトに戻す
                 const obj = JSON.parse(data)
-                for (const v of newArray) {
-                    if (obj[v]) {
-                        const diff = time - obj[v]
-                        const result = Math.floor(diff / (1000 * 60 * 60))
-                        if (result >= 48) {
-                            html += `<label><input type="checkbox"> ${v}</label>`
-                        }
+                // 新しいオブジェクト
+                const newObj = {}
+                // キーを反復
+                for (const k in obj) {
+                    const diff = time - obj[k]
+                    const result = Math.floor(diff / (1000 * 60 * 60))
+                    if (result >= period) {
+                        continue
                     } else {
-                        html += `<label><input type="checkbox"> ${v}</label>`
+                        newObj[k] = obj[k]
+                    }
+                }
+                // 文字列にする
+                const json = JSON.stringify(newObj)
+                // ローカルストレージに書き込む
+                localStorage.setItem(localStorageKeyName, json)
+            }
+        }
+
+        function displayItems() {
+            let html = ""
+            // ローカルストレージを読み込む
+            const data = localStorage.getItem(localStorageKeyName)
+            if (data) {
+                // オブジェクトに戻す
+                const obj = JSON.parse(data)
+                // htmlを作る
+                for (const v of items) {
+                    if (obj[v[0]]) {
+                        continue
+                    } else {
+                        html += `<label><input type="checkbox" class="cb"> ${v[0]}</label><small>${v[1]}</small>`
                     }
                 }
             } else {
-                for (const v of newArray) {
-                    html += `<label><input type="checkbox"> ${v}</label>`
+                for (const v of items) {
+                    html += `<label><input type="checkbox" class="cb"> ${v[0]}</label><small>${v[1]}</small>`
                 }
             }
             itemBox.innerHTML = html
@@ -191,32 +256,14 @@
             beepSound.currentTime = 0
         }
 
-        function setLocalStorage(e) {
+        function onOffCheck(e) {
             let elm = e.target
-            if (elm.tagName === "INPUT" && elm.getAttribute("type") === "checkbox") {
-                const date = new Date()
-                // ミリ秒
-                const time = date.getTime()
-                // チェックできなくする
-                elm.disabled = true
+            if (elm.className === "cb") {
                 const keyText = elm.parentNode.textContent.trim()
-                // ローカルストレージを読み込む
-                const data = localStorage.getItem(localStorageKeyName)
-                if (data) {
-                    // オブジェクトに戻す
-                    const obj = JSON.parse(data)
-                    // 追加
-                    obj[keyText] = time
-                    // 文字列にする
-                    const json = JSON.stringify(obj)
-                    // ローカルストレージに書き込む
-                    localStorage.setItem(localStorageKeyName, json)
+                if (elm.checked) {
+                    addLocalStorage(keyText)
                 } else {
-                    // keyに変数展開したいときは[]で変数名を囲う
-                    // 文字列にする
-                    const json = JSON.stringify({ [keyText]: time })
-                    // ローカルストレージに書き込む
-                    localStorage.setItem(localStorageKeyName, json)
+                    delLocalStorage(keyText)
                 }
             }
         }
@@ -224,10 +271,11 @@
         startButton.addEventListener('click', startTimer)
         stopButton.addEventListener('click', stopTimer)
         resetButton.addEventListener('click', resetTimer)
-        itemBox.addEventListener('click', setLocalStorage)
+        itemBox.addEventListener('click', onOffCheck)
 
         // 初回実行
-        updateItem()
+        updateLocalStorage()
+        displayItems()
 
     </script>
 </body>
