@@ -12,37 +12,45 @@
         }
 
         h1,
-        p {
+        h2 {
             text-align: center;
         }
 
-        .itemBox {
-            width: 500px;
-            margin: 10px auto;
-            margin-bottom: 30px;
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            display: flex;
+            gap: 30px;
+        }
+
+        .box1 {
+            flex: 1;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 4rem;
+            font-weight: bold;
+            color: red;
+            margin: 20px 0;
+        }
+
+        .btn {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 5px;
+        }
+
+        .box2 {
+            flex: 2;
         }
 
         label {
             display: block;
-            margin-top: 10px;
-        }
-
-        .timeBox {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .timer {
-            font-size: 2rem;
-        }
-
-        button {
-            font-size: 1rem;
-            margin: 10px;
-        }
-
-        label {
             font-size: 1.3rem;
         }
 
@@ -50,28 +58,32 @@
 </head>
 
 <body>
-
-    <h1>筋トレ種目</h1>
-
-    <div class="timeBox">
-        <div class="timer">
-            <span id="minutes">0</span>:<span id="seconds">00</span>
+    <div class="container">
+        <div class="box1">
+            <h1>筋トレ・タイマー</h1>
+            <div class="timer">
+                <span id="minutes">0</span>:<span id="seconds">00</span>
+            </div>
+            <div class="btn">
+                <button id="startButton">スタート</button>
+                <button id="stopButton">停止</button>
+                <button id="resetButton">リセット</button>
+            </div>
+            <ul>
+                <li>checkしたものはlocalStorageに保存。<span id="period">72</span>時間表示しない</li>
+                <li>筋トレは毎日ではなく2～3日に一回程度、つまり週に2～3回程度を推奨（しかし部位別トレーニングの場合、同部位を続けて筋トレしないようにすれば、週5～6回行ってもいい）</li>
+                <li>筋肉が緊張している継続時間を長くする（腕立て伏せの場合下ろす動作をゆっくり行う）</li>
+                <li>鍛えたい筋肉の部位を意識する（マインドマッスルコネクション）</li>
+                <li>【重量 * 回数 * セット数 = 総負荷量】100kg * 10回 * 3セット = 3000 の場合と、
+                    腕立て伏せ（体重の60%として）75kgの人ならば 45kg * 23回 * 3セット = 3150 と総負荷量は同等
+                </li>
+            </ul>
         </div>
-        <button id="startButton">スタート</button>
-        <button id="stopButton">停止</button>
-        <button id="resetButton">リセット</button>
-    </div>
-
-    <p>
-        checkしたものはlocalStorageに保存。<span id="period">50</span>時間表示しない。<br>
-        筋トレは毎日ではなく2～3日に一回程度、つまり週に2～3回程度を推奨<br>
-        しかし部位別トレーニングの場合、同部位を続けて筋トレしないようにすれば、週5～6回行ってもいい<br>
-        【注意点】<br>
-        筋肉が緊張している継続時間を長くする（腕立て伏せの場合下ろす動作をゆっくり行う）<br>
-        鍛えたい筋肉の部位を意識する（マインドマッスルコネクション）<br>
-    </p>
-
-    <div class="itemBox">
+        <div class="box2">
+            <h2>種目</h2>
+            <div class="itemBox">
+            </div>
+        </div>
     </div>
 
     <script>
