@@ -4,82 +4,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>筋トレ・タイマー</title>
+    <title>筋トレタイマー</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: white;
-            color: black;
+            background-color: black;
+            color: aliceblue;
         }
 
         h1,
         h2 {
+            margin: 20px 0;
             text-align: center;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 20px auto;
-            display: flex;
-            gap: 30px;
-        }
-
-        .box1 {
-            flex: 1;
         }
 
         .timer {
-            text-align: center;
-            font-size: 4rem;
-            font-weight: bold;
-            color: red;
-            margin: 20px 0;
+            width: 250px;
+            margin: 20px auto;
+        }
+
+        button {
+            padding: 10px;
+        }
+
+        #canvas {
+            width: 200px;
         }
 
         .btn {
             display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
+            justify-content: space-between;
         }
 
-        button {
-            padding: 5px;
+        p {
+            text-align: center;
         }
 
-        .box2 {
-            flex: 2;
+        .itemBox {
+            max-width: 600px;
+            margin: 20px auto;
         }
 
         label {
             display: block;
             font-size: 1.3rem;
-            padding: 5px 0;
+            padding: 5px;
+            background-color: white;
+            color: black;
+            border-radius: 5px;
+        }
+
+        small {
+            display: block;
+            padding: 10px;
         }
 
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/addons/p5.sound.min.js"></script>
 </head>
 
 <body>
-    <div class="container">
-        <div class="box1">
-            <h1>筋トレ・タイマー</h1>
-            <div class="timer">
-                <span id="minutes">0</span>:<span id="seconds">00</span>
-            </div>
-            <div class="btn">
-                <button id="startButton">スタート</button>
-                <button id="stopButton">停止</button>
-                <button id="resetButton">リセット</button>
-            </div>
-            <ul>
-                <li>checkしたものはlocalStorageに保存。<span id="period">72</span>時間表示しない</li>
-            </ul>
-        </div>
-        <div class="box2">
-            <h2>種目</h2>
-            <div class="itemBox">
-            </div>
+
+    <h1>筋トレタイマー</h1>
+    <div class="timer">
+        <div id="canvas"></div>
+        <div class="btn">
+            <button id="startButton">スタート</button>
+            <button id="stopButton">停止</button>
+            <button id="resetButton">リセット</button>
         </div>
     </div>
+    <p>checkしたものはlocalStorageに保存。<span id="period">72</span>時間表示しない。</p>
+    <h2>種目</h2>
+    <div class="itemBox">
+    </div>
+
+
 
     <script>
         const items = [
@@ -88,9 +94,8 @@
             ["シングルレッグカーフレイズ", "壁に手を付き、片足をもう片方の足に掛けた姿勢から爪先立ちになり、かかとを上下させる。ふくらはぎの筋トレ。"],
             ["プッシュアップ", "前ならえをした状態で、手を2つ分外側にした状態の腕立て伏せ"],
             ["クランチ", "仰向けで寝て、太ももが床から直角になる位置に上げ、足先は膝よりやや上で、両足は揃える。頭は床につけない。腕は胸でクロスさせる。上半身を丸めて起こす感じ。肩甲骨が床から離れるまで起こす。顎は下げる。腹筋は息を吐く。"],
-            ["リバースクランチ", "クランチの姿勢で、お尻を床から上げて、両膝を肩に最も近づくように持って来る。戻す時足は床につけない。頭は床につけない。腕は体側。"],
             ["レッグレイズ", "仰向けに寝て、両脚は揃えて上下に動かす。床に足はつけない。"],
-            ["バックエクステンション", "うつ伏せの状態になり、手の平は上を向け両手は体の横（負荷を与えたければ腕を前に伸ばす）、息を吐きながら、無理なく上がる高さまで上体を上げ下げする。上げた時に手の平を回してもいい。頭は床をずっと見る。頭を上げない。"],
+            ["バックエクステンション", "うつ伏せの状態になり、手の平は上を向け両腕は体の横、息を吐きながら無理なく上がる高さまで上体を上げる。上げた時に手の平を外側に回す。頭は床をずっと見る。頭を上げない。"],
             ["ショルダープレス（チューブ）", "座ってダンベルを上下するように肩を鍛える。"],
             ["サイドレイズ（チューブ）", "立ってチューブを踏んで腕は曲げないで真横に上下するように肩を鍛える。"],
             ["デッドリフト（チューブ）", "背中"],
@@ -98,28 +103,77 @@
 
             // その他
             ["バックランジ", "重心は前。姿勢は真っ直ぐ。前膝はつま先より前に出ない。後ろ膝は軽く床につけて一瞬止まる感じ。"],
-            ["ブルガリアンスクワット", "片足でスクワット"],
             ["マウンテンクライマー", "腕立て伏せの姿勢で片膝を交互に胸に引きつけて戻す動作。リズムよく。"],
-            ["トライアングルプッシュアップ", "お尻を高く上げて、体をくの字の曲げた状態で、親指と人差指で三角形を作り、そこに鼻を入れる容量の腕立て伏せ"],
-            ["ワイドプッシュアップ", "前ならえをした状態で、手を3つ分外側にした状態の腕立て伏せ"],
+            ["トライアングルプッシュアップ", "お尻を高く上げて、体をくの字の曲げた状態で、親指と人差指で三角形を作り、そこに鼻を入れるような腕立て伏せ"],
             ["プランクアップダウン", "腕立て伏せの状態で、肩から足までがまっすぐになるように保ちます。右腕を曲げて肘をつき、次に左腕を曲げて肘をつきます。今度は右の肘を上げて手で立ち、左のひじも持ち上げ元の位置に戻ります。"],
             ["サイドプッシュアップ", "横向きになった姿勢で片腕で体を持ち上げる。"],
         ]
 
         const localStorageKeyName = "myData"
-        const period = Number(document.getElementById('period').textContent)
+        const period = Number(document.getElementById("period").textContent)
         const itemBox = document.querySelector('.itemBox')
-        const minutesDisplay = document.getElementById('minutes')
-        const secondsDisplay = document.getElementById('seconds')
-        const startButton = document.getElementById('startButton')
-        const stopButton = document.getElementById('stopButton')
-        const resetButton = document.getElementById('resetButton')
-        let beepSound = new Audio('./Hi-Hat-Closed-Hit.mp3')
+
+        const startButton = document.getElementById("startButton")
+        const stopButton = document.getElementById("stopButton")
+        const resetButton = document.getElementById("resetButton")
+
         let minutes = 0
         let seconds = 0
-        let timerInterval
-        let running = false
+        let running
+        let sound
 
+        function preload() {
+            sound = loadSound("./Hi-Hat-Closed-Hit.mp3")
+        }
+
+        function setup() {
+            running = false
+            const canvas = createCanvas(250, 100)
+            canvas.parent("canvas")
+            frameRate(1)
+        }
+
+        function draw() {
+            background(0)
+            fill("yellow")
+            textSize(50)
+            textAlign(CENTER, CENTER)
+
+            if (running) {
+                seconds++
+                if (seconds >= 60) {
+                    minutes++
+                    seconds = 0
+                }
+                sound.play()
+            }
+
+            const tmp_minutes = minutes < 10 ? `0${minutes}` : minutes
+            const tmp_seconds = seconds < 10 ? `0${seconds}` : seconds
+            text(`${tmp_minutes}:${tmp_seconds}`, 125, 58)
+        }
+
+
+        startButton.addEventListener("click", () => {
+            if (!running) {
+                loop()
+                running = true
+            }
+        })
+
+        stopButton.addEventListener("click", () => {
+            if (running) {
+                noLoop()
+                running = false
+            }
+        })
+
+        resetButton.addEventListener("click", () => {
+            noLoop()
+            running = false
+            minutes = 0
+            seconds = 0
+        })
 
         function addLocalStorage(keyText) {
             const date = new Date()
@@ -196,6 +250,18 @@
             }
         }
 
+        function onOffCheck(e) {
+            let elm = e.target
+            if (elm.className === "cb") {
+                const keyText = elm.parentNode.textContent.trim()
+                if (elm.checked) {
+                    addLocalStorage(keyText)
+                } else {
+                    delLocalStorage(keyText)
+                }
+            }
+        }
+
         function displayItems() {
             let html = ""
             // ローカルストレージを読み込む
@@ -219,68 +285,8 @@
             itemBox.innerHTML = html
         }
 
-        function updateTimer() {
-            seconds++
-            if (seconds >= 60) {
-                minutes++
-                seconds = 0
-            }
-
-            minutesDisplay.textContent = minutes
-            secondsDisplay.textContent = seconds < 10 ? `0${seconds}` : seconds
-
-            beepSound.pause()
-            beepSound.currentTime = 0
-            beepSound.play()
-        }
-
-        function startTimer() {
-            if (!running) {
-                running = true
-                // timerInterval = setInterval(updateTimer, 1000)
-                timerInterval = setTimeout(function request() {
-                    updateTimer()
-                    timerInterval = setTimeout(request, 1000)
-                }, 1000)
-            }
-        }
-
-        function stopTimer() {
-            running = false
-            clearInterval(timerInterval)
-            beepSound.pause()
-            beepSound.currentTime = 0
-        }
-
-        function resetTimer() {
-            running = false
-            clearInterval(timerInterval)
-            minutes = 0
-            seconds = 0
-            minutesDisplay.textContent = '0'
-            secondsDisplay.textContent = '00'
-            beepSound.pause()
-            beepSound.currentTime = 0
-        }
-
-        function onOffCheck(e) {
-            let elm = e.target
-            if (elm.className === "cb") {
-                const keyText = elm.parentNode.textContent.trim()
-                if (elm.checked) {
-                    addLocalStorage(keyText)
-                } else {
-                    delLocalStorage(keyText)
-                }
-            }
-        }
-
-        startButton.addEventListener('click', startTimer)
-        stopButton.addEventListener('click', stopTimer)
-        resetButton.addEventListener('click', resetTimer)
         itemBox.addEventListener('click', onOffCheck)
 
-        // 初回実行
         updateLocalStorage()
         displayItems()
 
